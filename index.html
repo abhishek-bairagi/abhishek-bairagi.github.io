@@ -3,132 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abhishek Bairagi - Data Scientist</title>
+    <title>Abhishek Bairagi - Data Sorcerer</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         header {
             background-color: #333;
             color: #fff;
             padding: 20px;
             text-align: center;
+            border-bottom-left-radius: 50%;
+            border-bottom-right-radius: 50%;
+            margin-bottom: -50px;
+            position: relative;
         }
         h1 {
             margin-top: 0;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         .container {
             max-width: 800px;
             margin: 20px auto;
-            padding: 0 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
         .profile-img {
             max-width: 200px;
             border-radius: 50%;
             margin: 20px auto;
             display: block;
+            border: 8px solid #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .intro {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
         }
         .social-links {
             text-align: center;
             margin-bottom: 20px;
-            margin-top: 20px; /* Add margin-top to create space */
         }
         .social-links a {
             margin: 0 10px;
             color: #333;
             font-size: 20px;
+            text-decoration: underline; /* Make links look clickable */
         }
-        .intro {
-            text-align: center;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(21, 0, 255, 0.1);
-            font-family: 'Roboto', sans-serif; /* Use the same font for the intro */
+        .social-links a:hover {
+            color: #666; /* Change color on hover */
         }
-        .projects {
-            margin-top: 10px;
-            margin-bottom: 50px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center; /* Center align the cards */
-        }
-        .project {
-            flex: 0 0 calc(33.33% - 20px);
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(195, 246, 192, 0.7);
+        .projects-heading, .open-source-heading, .blogs-heading , .publications-heading{
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 30px;
+    }
+        .project, .open-source-card ,    .blog-card,.publication-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 21, 255, 0.1);
             padding: 20px;
             transition: transform 0.3s ease;
-            margin-right: 20px; /* Add margin between each card */
+            margin-bottom: 20px;
+            margin-left: auto; /* Align cards to center */
+            margin-right: auto; /* Align cards to center */
+            max-width: 1000px; /* Set max width for cards */
         }
+        /* .open-source-card {
+        /* Other styles */
+        /* margin-bottom: 100px; Add bottom margin} */ 
 
-        .project:last-child {
-            margin-right: 0; /* Remove margin from the last card to prevent extra space */
-        }
-
-        .project:hover {
-            transform: scale(1.05); /* Increase the size of the card by 5% */
-        }
-        .project-heading {
-            margin-top: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
+   
+        .project:hover, .open-source-card:hover , .blog-card:hover , .publication-card:hover {
+            transform: scale(1.05);
         }
         .project-details {
-            margin-left: 10px;
-            margin-right: 10px;
-        }
-      
-        .projects-heading {
-            display: flex; /* Use flexbox */
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
-            margin-bottom: 30px; /* Add space between heading and cards */
+            margin-left: 20px;
+            list-style: none;
+            padding: 0;
         }
 
-        .project-logo {
-            width: 30px; /* Adjust as needed */
-            margin-right: 10px; /* Add space between logo and text */
-        }
+        .project-details {
+        padding-left: 20px; /* Add left padding to align with bullet points */
+    }
 
-        .open-source-heading {
-            text-align: center;
-            margin-top: 50px;
-            margin-bottom: 30px;
-        }
+    .project-details li {
+        margin-bottom: 5px; /* Add margin between subpoints */
+    }
 
-        .open-source-card {
-            flex: 0 0 calc(33.33% - 20px);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(195, 246, 192, 0.7);
-            padding: 20px;
-            transition: transform 0.3s ease;
-            margin-right: 20px; /* Add margin between each card */
-            margin-bottom: 50px;
-        }
+    /* New style for bullet points */
+    .project-details li::before , .blog-details li::before {
+        content: "•"; /* Unicode character for bullet point */
+        color: #333; /* Bullet point color */
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
 
-        .open-source-card:last-child {
-            margin-right: 0; /* Remove margin from the last card to prevent extra space */
-        }
+    .blog-details {
+        list-style: none;
+        padding: 0;
+    }
 
-        .open-source-card:hover {
-            transform: scale(1.05); /* Increase the size of the card by 5% */
-        }
-        
-        /* .logo-and-heading {
-    /* display: flex; */
-    /* align-items: center; */
-.project-logo {
-    width: 30px; /* Adjust the width as needed */
-    height: 30px; /* Maintain aspect ratio */
-}
+    .publication-card {
+        margin-bottom: 120px;
+    }
+
         footer {
             background-color: #333;
             color: #fff;
@@ -137,106 +129,123 @@
             position: fixed;
             bottom: 0;
             width: 100%;
+            border-top-left-radius: 50%;
+            border-top-right-radius: 50%;
         }
     </style>
 </head>
 <body>
     <header>
-        <header>
-            <h1 style="font-family: 'Roboto', sans-serif;">Abhishek Bairagi</h1>
-            <h2 style="font-family: 'Roboto', sans-serif;">Data Scientist</h2>
-        </header>
-        <!-- <p>Experienced Data Scientist with expertise in Natural Language Processing (NLP) tools, including TensorFlow, Keras, and Elasticsearch. Proven track record in transformative projects across healthcare, retail, and finance at Sapient.</p> -->
+        <h1>Abhishek Bairagi</h1>
+        <h2>Data Scientist</h2>
     </header>
     
     <div class="container">
-        <!-- Profile Image (Replace 'profile.jpg' with your actual image file name) -->
+        <!-- Profile Image -->
         <img src="profile.png" alt="Abhishek Bairagi" class="profile-img">
         <div class="intro">
-            <p>Experienced Data Scientist with expertise in Natural Language Processing (NLP) tools, including TensorFlow, Keras, and Elasticsearch. Proven track record in transformative projects across healthcare, retail, and finance at Sapient.</p>
+            <p>Experienced Data Scientist with expertise in Natural Language Potioncraft (NLP) tools, including TensorFlow, Keras, and Elasticsearch. Master of transformative projects across healthcare, retail, and finance at Publicis Sapient.</p>
         </div>
         <!-- Social Links -->
         <div class="social-links">
-            <!-- LinkedIn (Replace '#' with your actual LinkedIn profile URL) -->
             <a href="https://www.linkedin.com/in/abhishek-bairagi/" target="_blank">LinkedIn</a>
-            <!-- GitHub (Replace '#' with your actual GitHub profile URL) -->
             <a href="https://github.com/abhishek-bairagi" target="_blank">GitHub</a>
             <a href="https://medium.com/@bairagiabhishek03" target="_blank">Medium</a>
+            <br>
+            <br>
             <a href="latest_resume.pdf" target="_blank">Resume</a>
         </div>
-        
-        <!-- Resume (Replace '#' with the URL to your resume file) -->
-        
     </div>
 
-    <!-- Projects -->
-    <div class="projects-heading">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Noun_Project_projects_icon_1327109_cc.svg" alt="Project Icon" class="project-logo">
-        <h2>Projects</h2>
+   <!-- Projects -->
+<div class="projects-heading">
+    <h2>🔮 Projects</h2>
+</div>
+<div class="projects">
+    <!-- Project 1 -->
+    <div class="project">
+        <p class="project-heading"><b>RFP-AI</b></p>
+        <ul class="project-details">
+            <li>Developed a Gen AI-powered platform to streamline the RFP response process</li>
+            <li>Integrated NLP applications, large language models, and a knowledge management system</li>
+            <li>Achieved a 40% time saving and a 2X increase in response rates through effective automation</li>
+        </ul>
     </div>
-    <div class="projects">
-        <!-- Project 1 -->
-        <div class="project">
-            <p class="project-heading">RFP-AI</p>
-            <ul class="project-details">
-                <li>Developed a Gen AI-powered platform to streamline the RFP response process</li>
-                <li>Integrated NLP applications, large language models, and a knowledge management system</li>
-                <li>Achieved a 40% time saving and a 2X increase in response rates through effective automation</li>
-            </ul>
-        </div>
-        <!-- Project 2 -->
-        <div class="project">
-            <p class="project-heading">Speech-enabled Scalp Therapist Chatbot</p>
-            <ul class="project-details">
-                <li>Developed an interactive voice-enabled chatbot for scalp and hair therapy</li>
-                <li>Powered by Generative AI technology and Azure bot framework</li>
-                <li>Empowers customers to evaluate scalp & hair condition and receive personalized tips</li>
-            </ul>
-        </div>
-        <!-- Project 3 -->
-        <div class="project">
-            <p class="project-heading">GenAI-Driven Chatbots</p>
-            <ul class="project-details">
-                <li>Engineered cutting-edge chatbots tailored for clients from diverse industries</li>
-                <li>Covering use-cases like product recommendation, information search, and insight summarization</li>
-                <li>Leveraged chatbot frameworks, large language models, and extensive guardrails</li>
-            </ul>
-        </div>
-        <!-- Project 4 -->
-        <div class="project">
-            <p class="project-heading">Semantic Product Search</p>
-            <ul class="project-details">
-                <li>Achieved significant improvements in search relevance for fashion and electronics industries</li>
-                <li>Implemented a highly effective semantic product search solution combined with learn-to-rank technology</li>
-                <li>Utilized Elasticsearch and advanced product-attribute detection techniques</li>
-            </ul>
-        </div>
-        <!-- Project 5 -->
-        <div class="project">
-            <p class="project-heading">Social Media Listening</p>
-            <ul class="project-details">
-                <li>Led the development of KaaS SML (Brandwatch), an advanced NLP platform</li>
-                <li>Enabled businesses to analyze brand perception in the market</li>
-                <li>Utilized sentiment analysis, summarization, and entity recognition through customer reviews and news articles</li>
-            </ul>
-        </div>
+    <!-- Project 2 -->
+    <div class="project">
+        <p class="project-heading"><b>Speech-enabled Scalp Therapist Chatbot</b></p>
+        <ul class="project-details">
+            <li>Developed an interactive voice-enabled chatbot for scalp and hair therapy</li>
+            <li>Powered by Generative AI technology and Azure bot framework</li>
+            <li>Empowers customers to evaluate scalp & hair condition and receive personalized tips</li>
+        </ul>
     </div>
+    <!-- Project 3 -->
+    <div class="project">
+        <p class="project-heading"><b>GenAI-Driven Chatbots</b></p>
+        <ul class="project-details">
+            <li>Engineered cutting-edge chatbots tailored for clients from diverse industries</li>
+            <li>Covering use-cases like product recommendation, information search, and insight summarization</li>
+            <li>Leveraged chatbot frameworks, large language models, and extensive guardrails</li>
+        </ul>
+    </div>
+    <!-- Project 4 -->
+    <div class="project">
+        <p class="project-heading"><b>Semantic Product Search</b></p>
+        <ul class="project-details">
+            <li>Achieved significant improvements in search relevance for fashion and electronics industries</li>
+            <li>Implemented a highly effective semantic product search solution combined with learn-to-rank technology</li>
+            <li>Utilized Elasticsearch and advanced product-attribute detection techniques</li>
+        </ul>
+    </div>
+    <!-- Project 5 -->
+    <div class="project">
+        <p class="project-heading"><b>Social Media Listening</b></p>
+        <ul class="project-details">
+            <li>Led the development of KaaS SML (Brandwatch), an advanced NLP platform</li>
+            <li>Enabled businesses to analyze brand perception in the market</li>
+            <li>Utilized sentiment analysis, summarization, and entity recognition through customer reviews and news articles</li>
+        </ul>
+    </div>
+</div>
 
-    <!-- Open Source Contribution -->
-    <div class="open-source-heading">
-        <div class="logo-and-heading">
-            <img src="https://www.clipartmax.com/png/middle/114-1147632_open-source-icon.png" alt="Open Source Icon" class="project-logo">
-            <h2>Open Source Contribution</h2>
-        </div>
+<!-- Open Source Contribution -->
+<div class="open-source-heading">
+    <h2>🌟 Open Source Contribution</h2>
+</div>
+<div class="projects open-source-projects">
+    <!-- Open Source Project 1 -->
+    <div class="open-source-card">
+        <p class="project-heading"><a href="https://github.com/PipableAI/pip-library-etl" target="_blank">PIP_LIBRARY_ETL</a></p>
+        <p class="project-details">Contributed key features to the PIP_LIBRARY_ETL Python toolkit, designed to automate the documentation of Python codes using specialized open-source LLMs.</p>
     </div>
-    <div class="projects open-source-projects">
-        <!-- Open Source Project 1 -->
-        <div class="open-source-card">
-            <p class="project-heading"><a href="https://github.com/PipableAI/pip-library-etl" target="_blank">PIP_LIBRARY_ETL</a></p>
-            <p class="project-details">Contributed key features to the PIP_LIBRARY_ETL Python toolkit, designed to automate the documentation of Python codes using specialized open-source LLMs.</p>
-        </div>
+</div>
+
+    <!-- Blogs -->
+<div class="blogs-heading">
+    <h2>✍️ Blogs</h2>
+</div>
+<div class="blogs">
+    <!-- Blog 1 -->
+    <div class="blog-card">
+        <p class="blog-heading"><a href="https://medium.com/@bairagiabhishek03/list/elasticsearch-tutorials-d03f237a4c78" target="_blank">Elasticsearch Tutorial Series on Medium!</a></p>
+        <p class="blog-details">5-part tutorial series for Elasticsearch covering everything from installation to advanced search techniques.</p>
+            
     </div>
-    
+</div>
+
+
+    <!-- Publications -->
+<div class="publications-heading">
+    <h2>📚 Publications</h2>
+</div>
+<div class="publications">
+    <!-- Publication 1 -->
+    <div class="publication-card">
+        <p class="publication-heading"><a href="https://ieeexplore.ieee.org/document/9801635" target="_blank">A Cross-Platform HD Dataset and a Two-Step Framework for Robust Aerial Image Matching, IEEE</a></p>
+    </div>
+</div>
+
     <footer>
         &copy; 2024 Abhishek Bairagi | bairagiabhishek03@gmail.com
     </footer>
