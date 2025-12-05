@@ -11,7 +11,34 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            margin: 10px 0;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .sidebar a:hover {
+            color: #00f;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            flex-grow: 1;
         }
         header {
             background-color: #333;
@@ -64,6 +91,9 @@
         }
         .social-links a:hover {
             color: #666; /* Change color on hover */
+        }
+        .dynamic-content {
+            margin-top: 30px;
         }
         .projects-heading, .open-source-heading, .blogs-heading , .publications-heading{
         text-align: center;
@@ -132,122 +162,102 @@
             border-top-left-radius: 50%;
             border-top-right-radius: 50%;
         }
+
+        /* Add hover effect for cards */
+        .card {
+            background-color: #ffffff; /* Ensure a white background for cards */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth animation */
+            padding: 20px; /* Add padding inside the card */
+            margin-bottom: 20px; /* Space between cards */
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.05); /* Pop-out effect */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+            background-color: #f9f9f9; /* Slightly lighter background on hover */
+        }
+
+        .card p, .card ul {
+            margin: 0; /* Remove default margins */
+            padding: 0; /* Remove default padding */
+        }
+
+        .card ul {
+            list-style: none; /* Remove bullet points */
+            padding-left: 20px; /* Add left padding for alignment */
+        }
+
+        .card ul li {
+            margin-bottom: 10px; /* Add space between list items */
+        }
+
+        .card ul li::before {
+            content: "•"; /* Add a bullet point */
+            color: #333; /* Bullet color */
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Abhishek Bairagi</h1>
-        <h2>Data Scientist</h2>
-    </header>
-    
-    <div class="container">
-        <!-- Profile Image -->
-        <img src="profile.png" alt="Abhishek Bairagi" class="profile-img">
-        <div class="intro">
-            <p>Experienced Data Scientist with expertise in Natural Language Potioncraft (NLP) tools, including TensorFlow, Keras, and Elasticsearch. Master of transformative projects across healthcare, retail, and finance at Publicis Sapient.</p>
+    <div class="sidebar">
+        <h2>Navigation</h2>
+        <a href="#" onclick="loadSection('projects.html')" class="sidebar-link" data-file="projects.html">Projects</a>
+        <a href="#" onclick="loadSection('open-source.html')" class="sidebar-link" data-file="open-source.html">Open Source</a>
+        <a href="#" onclick="loadSection('blogs.html')" class="sidebar-link" data-file="blogs.html">Blogs</a>
+        <a href="#" onclick="loadSection('publications.html')" class="sidebar-link" data-file="publications.html">Publications</a>
+        <a href="notes.html" class="sidebar-link">Notes</a> <!-- Updated to open as a new page -->
+    </div>
+    <div class="content">
+        <header>
+            <h1>Abhishek Bairagi</h1>
+            <h2>Data Scientist</h2>
+        </header>
+        
+        <div class="container">
+            <!-- Profile Image -->
+            <img src="profile.png" alt="Abhishek Bairagi" class="profile-img">
+            <div class="intro">
+                <p>Experienced Data Scientist with expertise in Natural Language Processing and Generative AI </p>
+            </div>
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/abhishek-bairagi/" target="_blank">LinkedIn</a>
+                <a href="https://github.com/abhishek-bairagi" target="_blank">GitHub</a>
+                <a href="https://medium.com/@bairagiabhishek03" target="_blank">Medium</a>
+                <br>
+                <br>
+                <a href="latest_resume.pdf" target="_blank">Resume</a>
+            </div>
         </div>
-        <!-- Social Links -->
-        <div class="social-links">
-            <a href="https://www.linkedin.com/in/abhishek-bairagi/" target="_blank">LinkedIn</a>
-            <a href="https://github.com/abhishek-bairagi" target="_blank">GitHub</a>
-            <a href="https://medium.com/@bairagiabhishek03" target="_blank">Medium</a>
-            <br>
-            <br>
-            <a href="latest_resume.pdf" target="_blank">Resume</a>
-        </div>
+
+        <!-- Placeholder for dynamically loaded content -->
+        <iframe id="dynamic-content" style="width: 100%; height: 600px; border: none;"></iframe>
+
+        <footer>
+            &copy; 2024 Abhishek Bairagi | bairagiabhishek03@gmail.com
+        </footer>
     </div>
 
-   <!-- Projects -->
-<div class="projects-heading">
-    <h2>🔮 Projects</h2>
-</div>
-<div class="projects">
-    <!-- Project 1 -->
-    <div class="project">
-        <p class="project-heading"><b>RFP-AI</b></p>
-        <ul class="project-details">
-            <li>Developed a Gen AI-powered platform to streamline the RFP response process</li>
-            <li>Integrated NLP applications, large language models, and a knowledge management system</li>
-            <li>Achieved a 40% time saving and a 2X increase in response rates through effective automation</li>
-        </ul>
-    </div>
-    <!-- Project 2 -->
-    <div class="project">
-        <p class="project-heading"><b>Speech-enabled Scalp Therapist Chatbot</b></p>
-        <ul class="project-details">
-            <li>Developed an interactive voice-enabled chatbot for scalp and hair therapy</li>
-            <li>Powered by Generative AI technology and Azure bot framework</li>
-            <li>Empowers customers to evaluate scalp & hair condition and receive personalized tips</li>
-        </ul>
-    </div>
-    <!-- Project 3 -->
-    <div class="project">
-        <p class="project-heading"><b>GenAI-Driven Chatbots</b></p>
-        <ul class="project-details">
-            <li>Engineered cutting-edge chatbots tailored for clients from diverse industries</li>
-            <li>Covering use-cases like product recommendation, information search, and insight summarization</li>
-            <li>Leveraged chatbot frameworks, large language models, and extensive guardrails</li>
-        </ul>
-    </div>
-    <!-- Project 4 -->
-    <div class="project">
-        <p class="project-heading"><b>Semantic Product Search</b></p>
-        <ul class="project-details">
-            <li>Achieved significant improvements in search relevance for fashion and electronics industries</li>
-            <li>Implemented a highly effective semantic product search solution combined with learn-to-rank technology</li>
-            <li>Utilized Elasticsearch and advanced product-attribute detection techniques</li>
-        </ul>
-    </div>
-    <!-- Project 5 -->
-    <div class="project">
-        <p class="project-heading"><b>Social Media Listening</b></p>
-        <ul class="project-details">
-            <li>Led the development of KaaS SML (Brandwatch), an advanced NLP platform</li>
-            <li>Enabled businesses to analyze brand perception in the market</li>
-            <li>Utilized sentiment analysis, summarization, and entity recognition through customer reviews and news articles</li>
-        </ul>
-    </div>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('.sidebar-link');
+            const iframe = document.getElementById('dynamic-content');
 
-<!-- Open Source Contribution -->
-<div class="open-source-heading">
-    <h2>🌟 Open Source Contribution</h2>
-</div>
-<div class="projects open-source-projects">
-    <!-- Open Source Project 1 -->
-    <div class="open-source-card">
-        <p class="project-heading"><a href="https://github.com/PipableAI/pip-library-etl" target="_blank">PIP_LIBRARY_ETL</a></p>
-        <p class="project-details">Contributed key features to the PIP_LIBRARY_ETL Python toolkit, designed to automate the documentation of Python codes using specialized open-source LLMs.</p>
-    </div>
-</div>
+            links.forEach(link => {
+                // Skip the "Notes" link
+                if (link.getAttribute('href') === 'notes.html') return;
 
-    <!-- Blogs -->
-<div class="blogs-heading">
-    <h2>✍️ Blogs</h2>
-</div>
-<div class="blogs">
-    <!-- Blog 1 -->
-    <div class="blog-card">
-        <p class="blog-heading"><a href="https://medium.com/@bairagiabhishek03/list/elasticsearch-tutorials-d03f237a4c78" target="_blank">Elasticsearch Tutorial Series on Medium!</a></p>
-        <p class="blog-details">5-part tutorial series for Elasticsearch covering everything from installation to advanced search techniques.</p>
-            
-    </div>
-</div>
-
-
-    <!-- Publications -->
-<div class="publications-heading">
-    <h2>📚 Publications</h2>
-</div>
-<div class="publications">
-    <!-- Publication 1 -->
-    <div class="publication-card">
-        <p class="publication-heading"><a href="https://ieeexplore.ieee.org/document/9801635" target="_blank">A Cross-Platform HD Dataset and a Two-Step Framework for Robust Aerial Image Matching, IEEE</a></p>
-    </div>
-</div>
-
-    <footer>
-        &copy; 2024 Abhishek Bairagi | bairagiabhishek03@gmail.com
-    </footer>
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const filePath = link.getAttribute('data-file');
+                    iframe.src = filePath; // Set the iframe source to the file path
+                });
+            });
+        });
+    </script>
 </body>
 </html>
