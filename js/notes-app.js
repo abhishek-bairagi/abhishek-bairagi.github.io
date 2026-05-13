@@ -21,6 +21,20 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
+const NS = "[notes]";
+
+function log(...args) {
+  console.log(NS, ...args);
+}
+
+function warn(...args) {
+  console.warn(NS, ...args);
+}
+
+function logError(...args) {
+  console.error(NS, ...args);
+}
+
 function isConfigPlaceholder() {
   return (
     !firebaseConfig.apiKey ||
@@ -55,6 +69,21 @@ const els = {
   navOverlay: document.getElementById("nav-overlay"),
   topicTitle: document.getElementById("topic-title"),
 };
+
+const missingDomIds = Object.entries(els)
+  .filter(([, el]) => !el)
+  .map(([id]) => id);
+if (missingDomIds.length) {
+  logError("Missing DOM elements (ids):", missingDomIds.join(", "));
+}
+
+function maskEmail(email) {
+  if (!email || typeof email !== "string") return "(none)";
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  const safeLocal = local.length <= 2 ? "*" : `${local[0]}***${local[local.length - 1]}`;
+  return `${safeLocal}@${domain}`;
+}
 
 let app;
 let auth;
@@ -215,11 +244,13 @@ async function selectNote(noteId) {
 function attachTopicsListener() {
   if (unsubTopics) unsubTopics();
   const uid = state.uid;
+  log("Firestore: subscribe topics", { uid });
   const q = query(topicsCollectionRef(uid), orderBy("updatedAt", "desc"));
   unsubTopics = onSnapshot(
     q,
     (snap) => {
       state.topics = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      log("Firestore: topics snapshot", { count: state.topics.length, ids: state.topics.map((t) => t.id) });
       if (state.selectedTopicId && !state.topics.some((t) => t.id === state.selectedTopicId)) {
         state.selectedTopicId = null;
         state.selectedNoteId = null;
@@ -234,7 +265,7 @@ function attachTopicsListener() {
       }
     },
     (err) => {
-      console.error(err);
+      logError("Firestore topics listener error", err);
       setSaveStatus("Sync error", "error");
     }
   );
@@ -249,10 +280,12 @@ function attachNotesListener() {
     return;
   }
   const q = query(notesCollectionRef(uid, selectedTopicId), orderBy("updatedAt", "desc"));
+  log("Firestore: subscribe notes", { topicId: selectedTopicId });
   unsubNotes = onSnapshot(
     q,
     (snap) => {
       state.notes = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      log("Firestore: notes snapshot", { topicId: selectedTopicId, count: state.notes.length });
       renderNotes();
       if (state.selectedNoteId) {
         const live = state.notes.find((n) => n.id === state.selectedNoteId);
@@ -272,7 +305,7 @@ function attachNotesListener() {
       }
     },
     (err) => {
-      console.error(err);
+      logError("Firestore notes listener error", err);
       setSaveStatus("Sync error", "error");
     }
   );
@@ -485,41 +518,117 @@ function wireChrome() {
 }
 
 function showAuth() {
+  log("UI: show auth panel");
   els.appShell.hidden = true;
   els.authPanel.hidden = false;
 }
 
 function showApp() {
+  log("UI: show app shell (signed in)");
   els.authPanel.hidden = true;
   els.appShell.hidden = false;
 }
 
 function boot() {
+  log("boot() start", {
+    href: window.location.href,
+    origin: window.location.origin,
+    placeholderConfig: isConfigPlaceholder(),
+  });
+
   if (isConfigPlaceholder()) {
+    warn("Firebase config still has placeholders; sign-in disabled.");
     els.configBanner.hidden = false;
     els.authSubmit.disabled = true;
     document.body.classList.add("has-config-banner");
   }
 
+  if (!els.authForm) {
+    logError("auth-form not found; cannot attach submit listener.");
+    return;
+  }
+
   wireChrome();
   wireEditor();
+  log("Wired chrome + editor listeners");
 
-  els.authForm.addEventListener("submit", async (e) => {
+  /** Never use a real form POST (e.g. python http.server returns 501 for POST). */
+  els.authForm.addEventListener("submit", (e) => {
     e.preventDefault();
+    log("auth form: submit prevented (use Sign in or Enter)");
+  });
+
+  async function performSignIn() {
+    log("performSignIn()");
     els.authError.textContent = "";
     const email = els.authEmail.value.trim();
     const password = els.authPassword.value;
+    log("auth: values", {
+      emailMask: maskEmail(email),
+      passwordLength: password ? password.length : 0,
+    });
+    if (!email) {
+      warn("validation: empty email");
+      els.authError.textContent = "Enter your email address.";
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      warn("validation: invalid email format");
+      els.authError.textContent = "Enter a valid email address.";
+      return;
+    }
+    if (!password) {
+      warn("validation: empty password");
+      els.authError.textContent = "Enter your password.";
+      return;
+    }
+    const submitLabel = els.authSubmit.textContent;
     els.authSubmit.disabled = true;
+    els.authSubmit.textContent = "Signing in…";
+    log("calling signInWithEmailAndPassword…");
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      log("signInWithEmailAndPassword resolved", {
+        uid: cred.user.uid,
+        emailMask: maskEmail(cred.user.email || ""),
+      });
     } catch (err) {
-      els.authError.textContent = err.message || "Sign-in failed";
+      const code = err && err.code;
+      const map = {
+        "auth/invalid-email": "That email address does not look valid.",
+        "auth/user-disabled": "This account has been disabled.",
+        "auth/user-not-found": "No account found for this email.",
+        "auth/wrong-password": "Incorrect password.",
+        "auth/invalid-credential": "Wrong email or password.",
+        "auth/too-many-requests": "Too many attempts. Try again later.",
+        "auth/network-request-failed": "Network error. Check your connection and try again.",
+        "auth/operation-not-allowed": "Email/password sign-in is not enabled in the Firebase console.",
+        "auth/unauthorized-domain": "This site’s domain is not allowed. Use localhost or add this host under Firebase → Authentication → Authorized domains.",
+      };
+      els.authError.textContent =
+        map[code] || err.message || "Sign-in failed.";
+      logError("sign-in rejected", { code, message: err.message, err });
     } finally {
       els.authSubmit.disabled = false;
+      els.authSubmit.textContent = submitLabel;
+      log("performSignIn finished (button reset)");
     }
+  }
+
+  els.authSubmit.addEventListener("click", () => {
+    log("auth: Sign in clicked");
+    void performSignIn();
+  });
+
+  els.authForm.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.isComposing) return;
+    e.preventDefault();
+    log("auth: Enter key (sign in)");
+    void performSignIn();
   });
 
   onAuthStateChanged(auth, (user) => {
+    log("onAuthStateChanged", user ? { uid: user.uid, emailMask: maskEmail(user.email || "") } : { signedIn: false });
     if (state.topicSaveTimer) {
       clearTimeout(state.topicSaveTimer);
     }
@@ -556,17 +665,30 @@ function boot() {
     }
     state.uid = user.uid;
     showApp();
+    log("attaching Firestore topics listener");
     attachTopicsListener();
   });
+
+  log("boot() complete; waiting for auth state or user actions");
 }
 
 if (isConfigPlaceholder()) {
-  console.warn(
-    "[notes] Edit js/firebase-config.js with your Firebase web app config before signing in."
-  );
+  warn("Edit js/firebase-config.js with your Firebase web app config before signing in.");
 }
 
-app = initializeApp(firebaseConfig);
-auth = getAuth(app);
-db = getFirestore(app);
+log("module: initializing Firebase app", {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+});
+
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  log("Firebase App + Auth + Firestore ready");
+} catch (e) {
+  logError("initializeApp failed (check firebase-config.js)", e);
+  throw e;
+}
+
 boot();

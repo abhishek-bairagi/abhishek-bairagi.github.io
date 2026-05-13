@@ -166,6 +166,20 @@
       min-height: 1.2em;
     }
 
+    .auth-hint {
+      margin: 16px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .auth-hint code {
+      font-size: 11px;
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -548,17 +562,18 @@
       <div class="auth-card">
         <h1>Private notes</h1>
         <p>Sign in with the account you configured in Firebase. Your password is never stored in this repository; Firebase handles credentials securely.</p>
-        <form id="auth-form" autocomplete="on">
+        <form id="auth-form" autocomplete="on" novalidate>
           <div class="field">
             <label for="auth-email">Email</label>
-            <input id="auth-email" type="email" name="email" required autocomplete="username">
+            <input id="auth-email" type="email" name="email" autocomplete="username" inputmode="email">
           </div>
           <div class="field">
             <label for="auth-password">Password</label>
-            <input id="auth-password" type="password" name="password" required autocomplete="current-password">
+            <input id="auth-password" type="password" name="password" autocomplete="current-password">
           </div>
           <div id="auth-error" aria-live="polite"></div>
-          <button class="btn btn-primary" type="submit" id="auth-submit">Sign in</button>
+          <button class="btn btn-primary" type="button" id="auth-submit">Sign in</button>
+          <p class="auth-hint">If sign-in fails with “unauthorized domain”, open this page as <code>http://localhost:8000/notes.html</code> or add <code>127.0.0.1</code> under Firebase Authentication → Settings → Authorized domains.</p>
         </form>
       </div>
     </section>
