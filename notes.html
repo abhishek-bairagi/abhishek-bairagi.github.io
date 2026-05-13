@@ -1,62 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes - Abhishek Bairagi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #333;
-            color: #fff;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            margin: 10px 0;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        .sidebar a:hover {
-            color: #00f;
-        }
-        .content {
-            margin-left: 270px;
-            padding: 20px;
-            flex-grow: 1;
-        }
-        h1 {
-            font-size: 36px;
-            text-align: center;
-        }
-        p {
-            text-align: center;
-            font-size: 18px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes — Abhishek Bairagi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --danger: #dc2626;
+      --rail: #1f2937;
+      --rail-text: #f9fafb;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      --radius: 10px;
+      --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+      --font-editor: "Source Serif 4", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+    }
+
+    #config-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      padding: 12px 16px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 14px;
+      border-bottom: 1px solid #fcd34d;
+    }
+
+    body.has-config-banner {
+      padding-top: 48px;
+    }
+
+    .site-rail {
+      width: 220px;
+      flex-shrink: 0;
+      background: #2d2d2d;
+      color: var(--rail-text);
+      min-height: 100vh;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .site-rail h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    .site-rail a {
+      color: var(--rail-text);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .site-rail a:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #93c5fd;
+    }
+
+    .site-rail a.active {
+      background: rgba(37, 99, 235, 0.25);
+      color: #bfdbfe;
+    }
+
+    .main-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #auth-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow), 0 12px 40px rgba(15, 23, 42, 0.08);
+      border: 1px solid var(--border);
+    }
+
+    .auth-card h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .auth-card p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font: inherit;
+      background: #fafafa;
+    }
+
+    .field input:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    #auth-error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-bottom: 12px;
+      min-height: 1.2em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      width: 100%;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-color: var(--border);
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background: #f9fafb;
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #fee2e2;
+    }
+
+    .btn-icon {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    #app-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .app-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .app-top-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #btn-menu {
+      display: none;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .workspace {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .browser-rail {
+      width: 300px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .rail-section {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .rail-section.notes-section {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .rail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .rail-head span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .topic-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .topic-title-wrap label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    #topic-title {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    #topic-title:disabled {
+      background: #f3f4f6;
+      color: var(--muted);
+    }
+
+    .topic-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scroll-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 120px;
+    }
+
+    .topic-item,
+    .note-item {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: background 0.12s ease;
+    }
+
+    .topic-item:hover,
+    .note-item:hover {
+      background: #f3f4f6;
+    }
+
+    .topic-item.active,
+    .note-item.active {
+      background: var(--accent-soft);
+      color: #1e40af;
+      font-weight: 500;
+    }
+
+    .editor-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    #editor-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 15px;
+      text-align: center;
+    }
+
+    #editor-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 20px 24px 32px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    #save-status {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    #save-status[data-kind="pending"] { color: #b45309; }
+    #save-status[data-kind="saving"] { color: var(--accent); }
+    #save-status[data-kind="saved"] { color: #059669; }
+    #save-status[data-kind="error"] { color: var(--danger); }
+
+    #note-title {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      font-weight: 600;
+      font-family: var(--font-ui);
+      color: var(--text);
+      margin-bottom: 12px;
+      padding: 4px 0;
+    }
+
+    #note-title:focus {
+      outline: none;
+    }
+
+    #note-title::placeholder {
+      color: #d1d5db;
+    }
+
+    #note-body {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      border: none;
+      resize: none;
+      background: transparent;
+      font-family: var(--font-editor);
+      font-size: 17px;
+      line-height: 1.65;
+      color: #1f2937;
+      padding: 4px 0;
+    }
+
+    #note-body:focus {
+      outline: none;
+    }
+
+    #note-body::placeholder {
+      color: #d1d5db;
+    }
+
+    .nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 40;
+    }
+
+    body.nav-open .nav-overlay {
+      display: block;
+    }
+
+    body.nav-open .browser-rail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 50;
+      max-width: min(320px, 92vw);
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
+      transform: translateX(0);
+    }
+
+    @media (max-width: 960px) {
+      body { flex-direction: column; }
+
+      .site-rail {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        padding: 12px 16px;
+      }
+
+      .site-rail h2 { display: none; }
+
+      #btn-menu {
+        display: inline-flex;
+      }
+
+      .workspace {
+        position: relative;
+      }
+
+      .browser-rail {
+        position: fixed;
+        top: 52px;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        z-index: 45;
+      }
+
+      body.nav-open .browser-rail {
+        top: 52px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #note-title { font-size: 22px; }
+      #note-body { font-size: 16px; }
+      #editor-panel { padding: 16px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Navigation</h2>
-        <a href="index.html">Home</a> <!-- Home button -->
+  <div id="config-banner" hidden>
+    Add your Firebase web app values in <code>js/firebase-config.js</code>, then deploy Firestore rules from <code>firestore.rules</code>. Enable Email/Password in Firebase Authentication and add your GitHub Pages domain under Authorized domains.
+  </div>
+
+  <aside class="site-rail" aria-label="Site">
+    <h2>Site</h2>
+    <a href="index.html">Home</a>
+    <a href="notes.html" class="active">Notes</a>
+  </aside>
+
+  <div class="main-area">
+    <section id="auth-panel">
+      <div class="auth-card">
+        <h1>Private notes</h1>
+        <p>Sign in with the account you configured in Firebase. Your password is never stored in this repository; Firebase handles credentials securely.</p>
+        <form id="auth-form" autocomplete="on">
+          <div class="field">
+            <label for="auth-email">Email</label>
+            <input id="auth-email" type="email" name="email" required autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="auth-password">Password</label>
+            <input id="auth-password" type="password" name="password" required autocomplete="current-password">
+          </div>
+          <div id="auth-error" aria-live="polite"></div>
+          <button class="btn btn-primary" type="submit" id="auth-submit">Sign in</button>
+        </form>
+      </div>
+    </section>
+
+    <div id="app-shell" hidden>
+      <header class="app-top">
+        <div class="app-top-left">
+          <button type="button" class="btn btn-icon" id="btn-menu" aria-label="Open topics and notes">☰</button>
+          <span class="app-title">Notes</span>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-logout">Sign out</button>
+      </header>
+
+      <div class="workspace">
+        <div id="nav-overlay" class="nav-overlay" aria-hidden="true"></div>
+        <aside class="browser-rail" aria-label="Topics and notes">
+          <div class="rail-section">
+            <div class="rail-head">
+              <span>Topic</span>
+              <button type="button" class="btn btn-ghost" id="btn-add-topic" style="padding:6px 10px;font-size:13px;">+ New</button>
+            </div>
+            <div class="topic-title-wrap">
+              <label for="topic-title">Title</label>
+              <input id="topic-title" type="text" placeholder="Topic name" disabled autocomplete="off">
+            </div>
+            <div class="topic-actions">
+              <button type="button" class="btn btn-danger" id="btn-delete-topic" disabled>Delete topic</button>
+            </div>
+            <ul id="topics-list" class="scroll-list" aria-label="Topics"></ul>
+          </div>
+          <div class="rail-section notes-section">
+            <div class="rail-head">
+              <span>Notes</span>
+              <button type="button" class="btn btn-ghost" id="btn-add-note" style="padding:6px 10px;font-size:13px;" disabled>+ Note</button>
+            </div>
+            <ul id="notes-list" class="scroll-list" aria-label="Notes in topic"></ul>
+          </div>
+        </aside>
+
+        <section class="editor-wrap">
+          <div id="editor-empty" hidden>Select a topic and note, or create your first topic.</div>
+          <div id="editor-panel" hidden>
+            <div class="editor-toolbar">
+              <span id="save-status" data-kind="idle">Saved</span>
+              <button type="button" class="btn btn-danger" id="btn-delete-note" disabled>Delete note</button>
+            </div>
+            <input id="note-title" type="text" placeholder="Untitled" autocomplete="off" aria-label="Note title">
+            <textarea id="note-body" placeholder="Start writing…" aria-label="Note body"></textarea>
+          </div>
+        </section>
+      </div>
     </div>
-    <div class="content">
-        <h1>Welcome to Notes</h1>
-        <p>Hey, welcome to the Notes section! I created this space to store notes for my AI/ML journey.</p>
-    </div>
+  </div>
+
+  <script type="module" src="js/notes-app.js"></script>
 </body>
 </html>

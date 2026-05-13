@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Personal notes: only the signed-in user may access their own subtree.
+    match /users/{userId}/topics/{topicId} {
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+
+      match /notes/{noteId} {
+        allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}
