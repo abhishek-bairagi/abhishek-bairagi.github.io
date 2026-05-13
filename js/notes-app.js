@@ -64,8 +64,11 @@ const els = {
   noteBody: document.getElementById("note-body"),
   saveStatus: document.getElementById("save-status"),
   btnDeleteNote: document.getElementById("btn-delete-note"),
-  btnDeleteTopic: document.getElementById("btn-delete-topic"),
   btnMenu: document.getElementById("btn-menu"),
+  topicsColumn: document.getElementById("topics-column"),
+  notesColumn: document.getElementById("notes-column"),
+  btnToggleTopics: document.getElementById("btn-toggle-topics"),
+  btnToggleNotes: document.getElementById("btn-toggle-notes"),
   navOverlay: document.getElementById("nav-overlay"),
   topicTitle: document.getElementById("topic-title"),
 };
@@ -90,6 +93,16 @@ let auth;
 let db;
 let unsubTopics = null;
 let unsubNotes = null;
+
+/** Firestore writes must never run without a live Firebase session. */
+function requireCurrentUid() {
+  const u = auth && auth.currentUser;
+  if (!u || !u.uid) {
+    warn("Blocked: not signed in (no Firebase user).");
+    return null;
+  }
+  return u.uid;
+}
 
 let state = {
   uid: null,
@@ -136,29 +149,44 @@ function syncTopicHeader() {
   if (!t) {
     els.topicTitle.value = "";
     els.topicTitle.disabled = true;
-    els.btnDeleteTopic.disabled = true;
     return;
   }
   els.topicTitle.disabled = false;
-  els.btnDeleteTopic.disabled = false;
   if (document.activeElement !== els.topicTitle) {
     els.topicTitle.value = t.title || "";
   }
 }
 
+const DELETE_ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+
 function renderTopics() {
   els.topicsList.innerHTML = "";
   state.topics.forEach((t) => {
     const li = document.createElement("li");
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "topic-item" + (t.id === state.selectedTopicId ? " active" : "");
-    btn.textContent = t.title || "Untitled topic";
-    btn.addEventListener("click", () => {
+    li.className = "list-row";
+
+    const main = document.createElement("button");
+    main.type = "button";
+    main.className = "topic-item" + (t.id === state.selectedTopicId ? " active" : "");
+    main.textContent = t.title || "Untitled topic";
+    main.addEventListener("click", () => {
       void selectTopic(t.id);
       closeMobileNav();
     });
-    li.appendChild(btn);
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "row-delete-btn";
+    del.setAttribute("aria-label", "Delete topic");
+    del.innerHTML = DELETE_ICON_SVG;
+    del.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      void deleteTopicById(t.id);
+    });
+
+    li.appendChild(main);
+    li.appendChild(del);
     els.topicsList.appendChild(li);
   });
   syncTopicHeader();
@@ -174,15 +202,29 @@ function renderNotes() {
   els.btnAddNote.disabled = false;
   state.notes.forEach((n) => {
     const li = document.createElement("li");
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "note-item" + (n.id === state.selectedNoteId ? " active" : "");
-    btn.textContent = n.title || "Untitled note";
-    btn.addEventListener("click", () => {
+    li.className = "list-row";
+
+    const main = document.createElement("button");
+    main.type = "button";
+    main.className = "note-item" + (n.id === state.selectedNoteId ? " active" : "");
+    main.textContent = n.title || "Untitled note";
+    main.addEventListener("click", () => {
       void selectNote(n.id);
       closeMobileNav();
     });
-    li.appendChild(btn);
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "row-delete-btn";
+    del.setAttribute("aria-label", "Delete note");
+    del.innerHTML = DELETE_ICON_SVG;
+    del.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      void deleteNoteById(n.id);
+    });
+
+    li.appendChild(main);
+    li.appendChild(del);
     els.notesList.appendChild(li);
   });
 }
@@ -242,6 +284,10 @@ async function selectNote(noteId) {
 }
 
 function attachTopicsListener() {
+  if (!requireCurrentUid() || !state.uid) {
+    warn("attachTopicsListener: skipped (no user)");
+    return;
+  }
   if (unsubTopics) unsubTopics();
   const uid = state.uid;
   log("Firestore: subscribe topics", { uid });
@@ -272,6 +318,7 @@ function attachTopicsListener() {
 }
 
 function attachNotesListener() {
+  if (!requireCurrentUid()) return;
   if (unsubNotes) unsubNotes();
   unsubNotes = null;
   const { uid, selectedTopicId } = state;
@@ -312,6 +359,7 @@ function attachNotesListener() {
 }
 
 async function flushSave() {
+  if (!requireCurrentUid()) return true;
   if (!state.dirty || !state.uid || !state.selectedTopicId || !state.selectedNoteId) return true;
   const title = els.noteTitle.value;
   const body = els.noteBody.value;
@@ -355,7 +403,8 @@ function onEditorInput() {
 }
 
 async function addTopic() {
-  const uid = state.uid;
+  const uid = requireCurrentUid();
+  if (!uid) return;
   const ref = await addDoc(topicsCollectionRef(uid), {
     title: "New topic",
     updatedAt: serverTimestamp(),
@@ -365,7 +414,8 @@ async function addTopic() {
 }
 
 async function addNote() {
-  const uid = state.uid;
+  const uid = requireCurrentUid();
+  if (!uid) return;
   const tid = state.selectedTopicId;
   if (!tid) return;
   if (state.saveTimer) {
@@ -388,43 +438,7 @@ async function addNote() {
   closeMobileNav();
 }
 
-async function deleteCurrentNote() {
-  const uid = state.uid;
-  const tid = state.selectedTopicId;
-  const nid = state.selectedNoteId;
-  if (!tid || !nid) return;
-  if (state.saveTimer) {
-    clearTimeout(state.saveTimer);
-    state.saveTimer = null;
-  }
-  if (state.dirty) {
-    const ok = await flushSave();
-    if (!ok) return;
-  }
-  if (!confirm("Delete this note?")) return;
-  await deleteDoc(noteDocRef(uid, tid, nid));
-  await updateDoc(topicDocRef(uid, tid), { updatedAt: serverTimestamp() });
-  state.selectedNoteId = null;
-  showEditorEmpty();
-}
-
-async function deleteCurrentTopic() {
-  const uid = state.uid;
-  const tid = state.selectedTopicId;
-  if (!tid) return;
-  if (state.saveTimer) {
-    clearTimeout(state.saveTimer);
-    state.saveTimer = null;
-  }
-  if (state.dirty) {
-    const ok = await flushSave();
-    if (!ok) return;
-  }
-  if (!confirm("Delete this topic and all notes inside it?")) return;
-  if (state.topicSaveTimer) {
-    clearTimeout(state.topicSaveTimer);
-    state.topicSaveTimer = null;
-  }
+async function purgeTopicNotesAndDoc(uid, tid) {
   const nref = notesCollectionRef(uid, tid);
   const snap = await getDocs(nref);
   let batch = writeBatch(db);
@@ -440,12 +454,70 @@ async function deleteCurrentTopic() {
   }
   if (n > 0) await batch.commit();
   await deleteDoc(topicDocRef(uid, tid));
-  state.selectedTopicId = null;
-  state.selectedNoteId = null;
-  state.notes = [];
-  showEditorEmpty();
+}
+
+async function deleteNoteById(noteId) {
+  const uid = requireCurrentUid();
+  const tid = state.selectedTopicId;
+  if (!uid || !tid) return;
+  if (state.selectedNoteId === noteId && state.dirty) {
+    if (state.saveTimer) {
+      clearTimeout(state.saveTimer);
+      state.saveTimer = null;
+    }
+    const ok = await flushSave();
+    if (!ok) return;
+  }
+  if (!confirm("Delete this note?")) return;
+  await deleteDoc(noteDocRef(uid, tid, noteId));
+  await updateDoc(topicDocRef(uid, tid), { updatedAt: serverTimestamp() });
+  if (state.selectedNoteId === noteId) {
+    state.selectedNoteId = null;
+    showEditorEmpty();
+  }
+}
+
+async function deleteTopicById(topicId) {
+  const uid = requireCurrentUid();
+  if (!uid || !topicId) return;
+  if (topicId === state.selectedTopicId && state.dirty && state.selectedNoteId) {
+    if (state.saveTimer) {
+      clearTimeout(state.saveTimer);
+      state.saveTimer = null;
+    }
+    const ok = await flushSave();
+    if (!ok) return;
+  }
+  if (!confirm("Delete this topic and all notes inside it?")) return;
+  if (topicId === state.selectedTopicId && state.topicSaveTimer) {
+    clearTimeout(state.topicSaveTimer);
+    state.topicSaveTimer = null;
+  }
+  await purgeTopicNotesAndDoc(uid, topicId);
+  if (state.selectedTopicId === topicId) {
+    state.selectedTopicId = null;
+    state.selectedNoteId = null;
+    state.notes = [];
+    showEditorEmpty();
+    if (unsubNotes) {
+      unsubNotes();
+      unsubNotes = null;
+    }
+  }
   renderTopics();
   renderNotes();
+}
+
+async function deleteCurrentNote() {
+  const nid = state.selectedNoteId;
+  if (!nid) return;
+  await deleteNoteById(nid);
+}
+
+async function deleteCurrentTopic() {
+  const tid = state.selectedTopicId;
+  if (!tid) return;
+  await deleteTopicById(tid);
 }
 
 function scheduleTopicSave() {
@@ -457,7 +529,7 @@ function scheduleTopicSave() {
 }
 
 async function saveTopicTitleNow() {
-  const uid = state.uid;
+  const uid = requireCurrentUid();
   const tid = state.selectedTopicId;
   if (!uid || !tid || !els.topicTitle) return;
   const title = els.topicTitle.value.trim() || "Untitled topic";
@@ -501,8 +573,19 @@ function wireChrome() {
   els.btnAddTopic.addEventListener("click", () => addTopic().catch(console.error));
   els.btnAddNote.addEventListener("click", () => addNote().catch(console.error));
   els.btnDeleteNote.addEventListener("click", () => deleteCurrentNote().catch(console.error));
-  els.btnDeleteTopic.addEventListener("click", () => deleteCurrentTopic().catch(console.error));
   els.btnLogout.addEventListener("click", () => signOut(auth).catch(console.error));
+
+  function wireRailToggle(btn, col, label) {
+    if (!btn || !col) return;
+    btn.addEventListener("click", () => {
+      const collapsed = col.classList.toggle("rail-column--collapsed");
+      btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      btn.setAttribute("aria-label", collapsed ? `Expand ${label} panel` : `Collapse ${label} panel`);
+      btn.textContent = collapsed ? "›" : "‹";
+    });
+  }
+  wireRailToggle(els.btnToggleTopics, els.topicsColumn, "topics");
+  wireRailToggle(els.btnToggleNotes, els.notesColumn, "notes");
 
   els.btnMenu.addEventListener("click", () => {
     document.body.classList.toggle("nav-open");

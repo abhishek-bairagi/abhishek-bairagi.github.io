@@ -103,10 +103,28 @@
 
     #auth-panel {
       flex: 1;
-      display: flex;
       align-items: center;
       justify-content: center;
       padding: 32px 16px;
+    }
+
+    #auth-panel:not([hidden]) {
+      display: flex;
+    }
+
+    #auth-panel[hidden] {
+      display: none !important;
+    }
+
+    #app-shell[hidden] {
+      display: none !important;
+    }
+
+    #app-shell:not([hidden]) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .auth-card {
@@ -237,13 +255,6 @@
       background: var(--surface);
     }
 
-    #app-shell {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
     .app-top {
       display: flex;
       align-items: center;
@@ -279,38 +290,71 @@
     }
 
     .browser-rail {
-      width: 300px;
+      display: flex;
+      flex-direction: row;
+      align-self: stretch;
+      min-height: 0;
       flex-shrink: 0;
       background: var(--surface);
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
       transition: transform 0.2s ease;
     }
 
-    .rail-section {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
+    .rail-column {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      min-width: 0;
       min-height: 0;
+      width: 228px;
+      flex: 0 0 228px;
+      border-right: 1px solid var(--border);
+      transition: width 0.2s ease, flex-basis 0.2s ease;
     }
 
-    .rail-section.notes-section {
-      flex: 1;
-      overflow: hidden;
+    .rail-column:last-child {
+      border-right: none;
     }
 
-    .rail-head {
+    .rail-column--collapsed {
+      width: 40px;
+      flex: 0 0 40px;
+    }
+
+    .rail-column-head {
+      flex-shrink: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
+      padding: 8px 8px;
+      border-bottom: 1px solid var(--border);
+      background: #f9fafb;
     }
 
-    .rail-head span {
+    .rail-collapse-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rail-collapse-btn:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+
+    .rail-column-title {
+      flex: 1;
+      min-width: 0;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.06em;
@@ -318,10 +362,112 @@
       color: var(--muted);
     }
 
+    .btn-rail-add {
+      padding: 4px 8px !important;
+      font-size: 12px !important;
+      flex-shrink: 0;
+    }
+
+    .rail-column--collapsed .rail-column-title,
+    .rail-column--collapsed .btn-rail-add {
+      display: none !important;
+    }
+
+    .rail-column--collapsed .rail-column-head {
+      justify-content: center;
+      padding: 8px 4px;
+    }
+
+    .rail-column-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+      padding: 10px 10px 12px;
+    }
+
+    .rail-column--collapsed .rail-column-body {
+      display: none !important;
+    }
+
+    .scroll-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: stretch;
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+
+    .list-row .topic-item,
+    .list-row .note-item {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      padding: 8px 10px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    .list-row .topic-item:hover,
+    .list-row .note-item:hover {
+      background: #f3f4f6;
+    }
+
+    .list-row .topic-item.active,
+    .list-row .note-item.active {
+      background: var(--accent-soft);
+      color: #1e40af;
+      font-weight: 500;
+    }
+
+    .row-delete-btn {
+      flex-shrink: 0;
+      width: 34px;
+      min-width: 34px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      opacity: 0.65;
+      transition: color 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+    }
+
+    .row-delete-btn:hover {
+      color: var(--danger);
+      opacity: 1;
+      background: #fef2f2;
+    }
+
+    .row-delete-btn svg {
+      display: block;
+    }
+
     .topic-title-wrap {
       display: flex;
       flex-direction: column;
       gap: 6px;
+      flex-shrink: 0;
     }
 
     .topic-title-wrap label {
@@ -346,77 +492,58 @@
       color: var(--muted);
     }
 
-    .topic-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .scroll-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      overflow-y: auto;
-      flex: 1;
-      min-height: 120px;
-    }
-
-    .topic-item,
-    .note-item {
-      width: 100%;
-      text-align: left;
-      padding: 10px 12px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      font: inherit;
-      font-size: 14px;
-      color: var(--text);
-      cursor: pointer;
-      margin-bottom: 4px;
-      transition: background 0.12s ease;
-    }
-
-    .topic-item:hover,
-    .note-item:hover {
-      background: #f3f4f6;
-    }
-
-    .topic-item.active,
-    .note-item.active {
-      background: var(--accent-soft);
-      color: #1e40af;
-      font-weight: 500;
-    }
-
     .editor-wrap {
       flex: 1;
       min-width: 0;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      background: var(--bg);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      position: relative;
     }
 
-    #editor-empty {
+    /* Same issue as app-shell: author `display` must not override `[hidden]`. */
+    #editor-empty[hidden],
+    #editor-panel[hidden] {
+      display: none !important;
+    }
+
+    #editor-empty:not([hidden]) {
       flex: 1;
+      min-height: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px;
+      padding: clamp(24px, 4vw, 48px);
       color: var(--muted);
       font-size: 15px;
       text-align: center;
+      line-height: 1.6;
+      max-width: 28rem;
+      margin: 0 auto;
     }
 
-    #editor-panel {
+    #editor-panel:not([hidden]) {
       flex: 1;
+      min-height: 0;
+      width: 100%;
       display: flex;
       flex-direction: column;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .editor-inner {
+      flex: 1;
       min-height: 0;
-      padding: 20px 24px 32px;
-      max-width: 900px;
+      display: flex;
+      flex-direction: column;
       width: 100%;
-      margin: 0 auto;
+      max-width: none;
+      margin: 0;
+      padding: clamp(12px, 2vw, 20px) clamp(16px, 3vw, 40px) clamp(20px, 3vw, 48px);
     }
 
     .editor-toolbar {
@@ -424,7 +551,10 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      flex-shrink: 0;
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
     }
 
     #save-status {
@@ -441,12 +571,13 @@
       width: 100%;
       border: none;
       background: transparent;
-      font-size: 28px;
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
       font-weight: 600;
       font-family: var(--font-ui);
       color: var(--text);
-      margin-bottom: 12px;
-      padding: 4px 0;
+      margin: 0 0 8px;
+      padding: 8px 0 12px;
+      flex-shrink: 0;
     }
 
     #note-title:focus {
@@ -457,18 +588,27 @@
       color: #d1d5db;
     }
 
+    .editor-text-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin-top: 4px;
+    }
+
     #note-body {
       flex: 1;
+      min-height: 0;
       width: 100%;
-      min-height: 320px;
       border: none;
       resize: none;
       background: transparent;
       font-family: var(--font-editor);
-      font-size: 17px;
-      line-height: 1.65;
+      font-size: clamp(16px, 1.1vw + 14px, 18px);
+      line-height: 1.7;
       color: #1f2937;
-      padding: 4px 0;
+      padding: 8px 0 24px;
+      box-sizing: border-box;
     }
 
     #note-body:focus {
@@ -489,17 +629,6 @@
 
     body.nav-open .nav-overlay {
       display: block;
-    }
-
-    body.nav-open .browser-rail {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 50;
-      max-width: min(320px, 92vw);
-      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
-      transform: translateX(0);
     }
 
     @media (max-width: 960px) {
@@ -532,17 +661,56 @@
         bottom: 0;
         transform: translateX(-100%);
         z-index: 45;
+        flex-direction: column;
+        width: min(400px, 92vw);
+        box-shadow: none;
       }
 
       body.nav-open .browser-rail {
-        top: 52px;
+        transform: translateX(0);
+        z-index: 50;
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
+        width: min(440px, 94vw);
+      }
+
+      .rail-column {
+        width: 100% !important;
+        flex: 1 1 0 !important;
+        max-height: 44vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .rail-column:last-child {
+        border-bottom: none;
+      }
+
+      .rail-column--collapsed {
+        flex: 0 0 40px !important;
+        max-height: 40px;
+        width: 100% !important;
       }
     }
 
+    .editor-empty-title {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    #editor-empty:not([hidden]) p {
+      margin: 0;
+    }
+
+    #editor-empty:not([hidden]) p + p {
+      margin-top: 8px;
+    }
+
     @media (max-width: 600px) {
-      #note-title { font-size: 22px; }
+      #note-title { font-size: 1.25rem; }
       #note-body { font-size: 16px; }
-      #editor-panel { padding: 16px; }
+      .editor-inner { padding: 12px 14px 24px; }
     }
   </style>
 </head>
@@ -590,38 +758,48 @@
       <div class="workspace">
         <div id="nav-overlay" class="nav-overlay" aria-hidden="true"></div>
         <aside class="browser-rail" aria-label="Topics and notes">
-          <div class="rail-section">
-            <div class="rail-head">
-              <span>Topic</span>
-              <button type="button" class="btn btn-ghost" id="btn-add-topic" style="padding:6px 10px;font-size:13px;">+ New</button>
+          <div id="topics-column" class="rail-column rail-topics">
+            <div class="rail-column-head">
+              <button type="button" class="rail-collapse-btn" id="btn-toggle-topics" aria-expanded="true" aria-label="Collapse topics panel">‹</button>
+              <span class="rail-column-title">Topics</span>
+              <button type="button" class="btn btn-ghost btn-rail-add" id="btn-add-topic">+ New</button>
             </div>
-            <div class="topic-title-wrap">
-              <label for="topic-title">Title</label>
-              <input id="topic-title" type="text" placeholder="Topic name" disabled autocomplete="off">
+            <div class="rail-column-body">
+              <div class="topic-title-wrap">
+                <label for="topic-title">Title</label>
+                <input id="topic-title" type="text" placeholder="Topic name" disabled autocomplete="off">
+              </div>
+              <ul id="topics-list" class="scroll-list" aria-label="Topics"></ul>
             </div>
-            <div class="topic-actions">
-              <button type="button" class="btn btn-danger" id="btn-delete-topic" disabled>Delete topic</button>
-            </div>
-            <ul id="topics-list" class="scroll-list" aria-label="Topics"></ul>
           </div>
-          <div class="rail-section notes-section">
-            <div class="rail-head">
-              <span>Notes</span>
-              <button type="button" class="btn btn-ghost" id="btn-add-note" style="padding:6px 10px;font-size:13px;" disabled>+ Note</button>
+          <div id="notes-column" class="rail-column rail-notes">
+            <div class="rail-column-head">
+              <button type="button" class="rail-collapse-btn" id="btn-toggle-notes" aria-expanded="true" aria-label="Collapse notes panel">‹</button>
+              <span class="rail-column-title">Notes</span>
+              <button type="button" class="btn btn-ghost btn-rail-add" id="btn-add-note" disabled>+ Note</button>
             </div>
-            <ul id="notes-list" class="scroll-list" aria-label="Notes in topic"></ul>
+            <div class="rail-column-body">
+              <ul id="notes-list" class="scroll-list" aria-label="Notes in topic"></ul>
+            </div>
           </div>
         </aside>
 
         <section class="editor-wrap">
-          <div id="editor-empty" hidden>Select a topic and note, or create your first topic.</div>
+          <div id="editor-empty" hidden>
+            <p class="editor-empty-title">Nothing open</p>
+            <p>Pick a topic on the left, then a note—or create a topic and add a note. The whole area below will be your writing space.</p>
+          </div>
           <div id="editor-panel" hidden>
-            <div class="editor-toolbar">
-              <span id="save-status" data-kind="idle">Saved</span>
-              <button type="button" class="btn btn-danger" id="btn-delete-note" disabled>Delete note</button>
+            <div class="editor-inner">
+              <div class="editor-toolbar">
+                <span id="save-status" data-kind="idle">Saved</span>
+                <button type="button" class="btn btn-danger" id="btn-delete-note" disabled>Delete note</button>
+              </div>
+              <input id="note-title" type="text" placeholder="Untitled" autocomplete="off" aria-label="Note title">
+              <div class="editor-text-wrap">
+                <textarea id="note-body" placeholder="Write here — this area grows to fill the screen." aria-label="Note body"></textarea>
+              </div>
             </div>
-            <input id="note-title" type="text" placeholder="Untitled" autocomplete="off" aria-label="Note title">
-            <textarea id="note-body" placeholder="Start writing…" aria-label="Note body"></textarea>
           </div>
         </section>
       </div>
